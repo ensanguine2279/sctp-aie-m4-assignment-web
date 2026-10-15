@@ -20,7 +20,7 @@ export async function loginAction(
 
   try {
     const userServiceUrl = process.env.USER_SERVICE_URL;
-    const res = await fetch(`${userServiceUrl}`, {
+    const res = await fetch(`${userServiceUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -39,7 +39,7 @@ export async function loginAction(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 2, // 2 hours
+      maxAge: 60 * 60 * 1, // 1 hour
     });
   } catch (err) {
     return { error: "Unable to connect to authentication service." };
@@ -47,4 +47,14 @@ export async function loginAction(
 
   // Next.js redirect must be called outside try/catch blocks
   redirect("/dashboard");
+}
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+
+  // Clear the HttpOnly session cookie
+  cookieStore.delete("auth_token");
+
+  // Redirect to login page
+  redirect("/login");
 }
