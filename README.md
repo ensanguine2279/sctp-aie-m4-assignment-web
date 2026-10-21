@@ -1,3 +1,6 @@
+Here is the updated `README.md` with explicit, detailed RBAC sections for both **Task Management** and **User Management**:
+
+````markdown
 # Task Management Portal
 
 A modern, full-stack Next.js web application for organizational task management and user administration. Built on Next.js App Router, Server Actions, and Tailwind CSS, this portal integrates seamlessly with distributed Spring Boot microservices (`TASK_SERVICE_URL` and `USER_SERVICE_URL`) using RS256-signed JWTs for Role-Based Access Control (RBAC).
@@ -27,19 +30,31 @@ A modern, full-stack Next.js web application for organizational task management 
 
 ## Role-Based Access Control (RBAC)
 
-The application enforces strict RBAC across UI components, Server Actions, and backend endpoints:
+The application enforces strict RBAC across UI components, Server Actions, and backend API endpoints for both Task Management and User Management.
 
-| Feature / Action               |  `ADMIN`  | `MANAGER`  |     `USER`     |
-| :----------------------------- | :-------: | :--------: | :------------: |
-| **View Task List**             | All Tasks | All Tasks  | All / Filtered |
-| **Search & Priority Filter**   |    Yes    |    Yes     |      Yes       |
-| **Filter by Assignee**         |    Yes    |    Yes     |       No       |
-| **Toggle Task Completion**     | Any Task  |  Any Task  | Own Tasks Only |
-| **Create New Task**            |    Yes    |    Yes     |       No       |
-| **Edit Task / Reassign Owner** |    Yes    |    Yes     |       No       |
-| **Delete Task**                |    Yes    |    Yes     |       No       |
-| **Actions Column Visibility**  |  Visible  |  Visible   |   **Hidden**   |
-| **User Directory Management**  | Full CRUD | Restricted |   Restricted   |
+### 1. Task Management RBAC
+
+| Action / Feature               |  `ADMIN`  | `MANAGER` |     `USER`     |
+| :----------------------------- | :-------: | :-------: | :------------: |
+| **View Task Registry**         | All Tasks | All Tasks | All / Filtered |
+| **Search & Priority Filter**   |    Yes    |    Yes    |      Yes       |
+| **Filter by Assignee**         |    Yes    |    Yes    |       No       |
+| **Toggle Task Completion**     | Any Task  | Any Task  | Own Tasks Only |
+| **Create New Task**            |    Yes    |    Yes    |       No       |
+| **Edit Task / Reassign Owner** |    Yes    |    Yes    |       No       |
+| **Delete Task**                |    Yes    |    Yes    |       No       |
+| **Actions Column Visibility**  |  Visible  |  Visible  |   **Hidden**   |
+
+### 2. User Management RBAC (`/dashboard/users`)
+
+| Action / Feature                               | `ADMIN` |   `MANAGER`   |    `USER`     |
+| :--------------------------------------------- | :-----: | :-----------: | :-----------: |
+| **Access User Directory (`/dashboard/users`)** | Allowed | Access Denied | Access Denied |
+| **View System User List**                      |   Yes   |      No       |      No       |
+| **Search User Accounts**                       |   Yes   |      No       |      No       |
+| **Create New User**                            |   Yes   |      No       |      No       |
+| **Edit User Account / Role**                   |   Yes   |      No       |      No       |
+| **Delete User Account**                        |   Yes   |      No       |      No       |
 
 ---
 
@@ -141,3 +156,4 @@ To ensure data integrity between the Next.js frontend and the Java Spring Boot b
 - **Username**: 6 – 20 lowercase alphanumeric characters (`pattern="[a-z0-9]+"` required)
 - **Password**: 8 – 72 characters
 - **Role**: Required (`ADMIN`, `MANAGER`, `USER`)
+````
