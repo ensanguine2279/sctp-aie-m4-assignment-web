@@ -3,7 +3,14 @@ import { getSessionClaims } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import LogoutButton from "@/components/logout-button";
 import Link from "next/link";
-import { ShieldCheck, Eye, UserCheck, Layers, Users } from "lucide-react";
+import {
+  ShieldCheck,
+  Eye,
+  UserCheck,
+  Layers,
+  Users,
+  Network,
+} from "lucide-react";
 
 export default async function DashboardLayout({
   children,
@@ -37,9 +44,9 @@ export default async function DashboardLayout({
             <nav className="flex items-center space-x-4 text-xs font-medium text-gray-600 border-l border-gray-200 pl-6">
               <Link
                 href="/dashboard"
-                className="hover:text-gray-900 transition-colors"
+                className="hover:text-gray-900 transition-colors flex items-center"
               >
-                Operations
+                <Network className="w-3.5 h-3.5 mr-1" /> Orchestration
               </Link>
               <Link
                 href="/dashboard/users"
@@ -48,7 +55,7 @@ export default async function DashboardLayout({
                 <Users className="w-3.5 h-3.5 mr-1" /> Users
               </Link>
               <Link
-                href="/tasks"
+                href="/dashboard/tasks"
                 className="hover:text-[#209dd7] transition-colors flex items-center"
               >
                 <Layers className="w-3.5 h-3.5 mr-1" /> Tasks

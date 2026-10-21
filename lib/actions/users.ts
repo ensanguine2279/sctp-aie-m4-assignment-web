@@ -19,7 +19,7 @@ export interface UserFormState {
 }
 
 const USER_SERVICE_URL =
-  process.env.USER_SERVICE_URL || "http://localhost:8081";
+  process.env.USER_SERVICE_URL || "http://localhost:8022";
 
 async function getAuthHeader() {
   const cookieStore = await cookies();
@@ -127,15 +127,25 @@ export async function updateUserAction(
 
   const name = (formData.get("name") as string)?.trim();
   const role = formData.get("role") as UserRole;
+  const username = formData.get("username") as string;
   const password = formData.get("password") as string;
 
-  const payload: Record<string, unknown> = { name, role };
-  if (password) payload.password = password;
+  let method: string;
+  let payload: Record<string, unknown>;
+
+  // Conditionally construct payload and determine HTTP method
+  if (!password) {
+    method = "PATCH";
+    payload = { username, name, role };
+  } else {
+    method = "PUT";
+    payload = { username, name, role, password };
+  }
 
   try {
     const headers = await getAuthHeader();
     const res = await fetch(`${USER_SERVICE_URL}/api/users/${userId}`, {
-      method: "PUT",
+      method,
       headers,
       body: JSON.stringify(payload),
     });

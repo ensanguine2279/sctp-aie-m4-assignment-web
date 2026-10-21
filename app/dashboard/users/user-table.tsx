@@ -31,11 +31,15 @@ export default function UserTable({ initialUsers, isAdmin }: UserTableProps) {
   const [isPending, startTransition] = useTransition();
   const [errorMsg, setErrorMsg] = useState("");
 
-  const filteredUsers = initialUsers.filter(
-    (u) =>
-      u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredUsers = initialUsers
+    .filter(
+      (u) =>
+        u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    .sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+    );
 
   const handleDelete = (id: number) => {
     setErrorMsg("");
@@ -297,6 +301,16 @@ export default function UserTable({ initialUsers, isAdmin }: UserTableProps) {
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* --- MODAL ERROR MESSAGE --- */}
+            {errorMsg && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 p-3 text-xs flex items-center space-x-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+            {/* --------------------------- */}
+
             <form
               action={async (formData) => {
                 const res = await updateUserAction(
@@ -324,11 +338,32 @@ export default function UserTable({ initialUsers, isAdmin }: UserTableProps) {
                 />
               </div>
 
+              {/* Username Field */}
               <div>
                 <label className="block uppercase font-semibold text-gray-600 mb-1">
-                  New Password{" "}
+                  Username{" "}
                   <span className="text-gray-400 font-normal">
-                    (Leave blank to keep unchanged)
+                    (6-20 lowercase alphanumeric)
+                  </span>
+                </label>
+                <input
+                  name="username"
+                  type="text"
+                  defaultValue={editingUser.username}
+                  pattern="[a-z0-9]+"
+                  minLength={6}
+                  maxLength={20}
+                  required
+                  className="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#209dd7]"
+                />
+              </div>
+
+              {/* Password Field (Mandatory for strict backend validation) */}
+              <div>
+                <label className="block uppercase font-semibold text-gray-600 mb-1">
+                  Password{" "}
+                  <span className="text-gray-400 font-normal">
+                    (Leave blank to keep existing password)
                   </span>
                 </label>
                 <input
@@ -336,11 +371,12 @@ export default function UserTable({ initialUsers, isAdmin }: UserTableProps) {
                   type="password"
                   minLength={8}
                   maxLength={72}
-                  placeholder="••••••••"
+                  placeholder="Enter new or existing password"
                   className="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#209dd7]"
                 />
               </div>
 
+              {/* Role Selection */}
               <div>
                 <label className="block uppercase font-semibold text-gray-600 mb-1">
                   User Role
