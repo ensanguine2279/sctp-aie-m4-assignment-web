@@ -75,8 +75,6 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 └── package.json
 ```
 
-````
-
 ---
 
 ## Getting Started
@@ -143,8 +141,3 @@ To ensure data integrity between the Next.js frontend and the Java Spring Boot b
 - **Username**: 6 – 20 lowercase alphanumeric characters (`pattern="[a-z0-9]+"` required)
 - **Password**: 8 – 72 characters
 - **Role**: Required (`ADMIN`, `MANAGER`, `USER`)
-
-```
-
-```
-````
