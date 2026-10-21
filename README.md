@@ -1,6 +1,3 @@
-Here is the updated `README.md` with explicit, detailed RBAC sections for both **Task Management** and **User Management**:
-
-````markdown
 # Task Management Portal
 
 A modern, full-stack Next.js web application for organizational task management and user administration. Built on Next.js App Router, Server Actions, and Tailwind CSS, this portal integrates seamlessly with distributed Spring Boot microservices (`TASK_SERVICE_URL` and `USER_SERVICE_URL`) using RS256-signed JWTs for Role-Based Access Control (RBAC).
@@ -156,4 +153,7 @@ To ensure data integrity between the Next.js frontend and the Java Spring Boot b
 - **Username**: 6 – 20 lowercase alphanumeric characters (`pattern="[a-z0-9]+"` required)
 - **Password**: 8 – 72 characters
 - **Role**: Required (`ADMIN`, `MANAGER`, `USER`)
-````
+
+```
+
+```
