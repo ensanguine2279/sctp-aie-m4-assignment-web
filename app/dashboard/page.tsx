@@ -23,7 +23,7 @@ export default async function AdminDashboardPage() {
             <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
               <span>Enterprise Admin Portal</span>
               <span>•</span>
-              <span className="text-[#209dd7]">TaskMaster v1.0</span>
+              <span className="text-[#209dd7]">TaskFlow v1.0</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
               System Operations

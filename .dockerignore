@@ -1,0 +1,15 @@
+target/classes/
+target/test-classes/
+target/generated-sources/
+target/maven-status/
+.git
+.gitignore
+.idea/
+.vscode/
+.devcontainer/
+
+node_modules
+.next
+.git
+.env*.local
+.env
