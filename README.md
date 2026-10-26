@@ -180,10 +180,10 @@ graph TB
     end
 
     subgraph Pipeline ["Data Processing Pipeline"]
-        TaskTable --> Filter_Search["1#46; Search Filter: Title & Description"]
-        Filter_Search --> Filter_Priority["2#46; Priority Filter: LOW / MEDIUM / HIGH"]
-        Filter_Priority --> Filter_Assignee["3#46; Assignee Filter: User ID"]
-        Filter_Assignee --> Sort_Title["4#46; Title Sort: localeCompare Alphabetical"]
+        TaskTable --> Filter_Search["1) Search Filter: Title & Description"]
+        Filter_Search --> Filter_Priority["2) Priority Filter: LOW / MEDIUM / HIGH"]
+        Filter_Priority --> Filter_Assignee["3) Assignee Filter: User ID"]
+        Filter_Assignee --> Sort_Title["4) Title Sort: localeCompare Alphabetical"]
     end
 
     subgraph Render ["UI Render"]
@@ -229,23 +229,23 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 The application uses a 4-stage GitHub Actions workflow (`.github/workflows/ci.yml`) that automates code verification, semantic versioning, container image publishing, and Railway cloud deployment.
 
 ```mermaid
-graph LR
+graph TD
     subgraph Stage1 ["Stage 1: Test & Build"]
-        A["Git Push to main"] --> B["1#46; Lint, Test & Build Check"]
+        A["Git Push to main"] --> B["1) Lint, Test & Build Check"]
     end
 
     subgraph Stage2 ["Stage 2: Semantic Release"]
-        B -->|"Success"| C["2#46; Calculate Version & Create Release"]
+        B -->|"Success"| C["2) Calculate Version & Create Release"]
         C --> D["Generate Git Tag & GitHub Release Notes"]
     end
 
     subgraph Stage3 ["Stage 3: Publish"]
-        D -->|"Success"| E["3#46; Build Docker Image"]
+        D -->|"Success"| E["3) Build Docker Image"]
         E --> F["Push to Docker Hub<br/>:latest, :sha, :version, :tag"]
     end
 
     subgraph Stage4 ["Stage 4: Deploy"]
-        F -->|"Success"| G["4#46; Railway CLI Redeploy"]
+        F -->|"Success"| G["4) Railway CLI Redeploy"]
         G --> H["Railway pulls latest image & restarts service"]
     end
 ```
