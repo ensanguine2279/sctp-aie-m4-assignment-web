@@ -82,3 +82,13 @@ jobs:
         run: |
           npm install -g @railway/cli
           railway redeploy --service taskflow-nextjs --yes
+
+
+
+          	10.128.0.2 (nic0)	34.9.219.9  (nic0)
+
+            qwiklabs-gcp-04-ba3632f26733:us-central1:blog-db   35.223.48.167
+
+            snyk_uat.1fcad39e.eyJlIjoxNzk1MTc5MzE0LCJoIjoic255ay5pbyIsImoiOiJBYUZlaUM5blJwSEIzMVVBTjNVOElnIiwicyI6ImROOG9xdEY2U2t5WjVoNmlqaWY4SmciLCJ0aWQiOiJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBIn0.VRD6-GuqE1OW3ZvS5RKFuWek5XhHyLJLtxFIdXsvY1AaN4fUevgvihfdoxD_CDL_TUnzNXAWKYg0XHyiaL1GBA
+
+            docker swarm join --token SWMTKN-1-69evyyo3gwbqxxueubys61h4x1ed027zzk4uyef3wbnb3zhwuf-88okjdjwl6eidvorczm30qsy6 10.148.0.2:2377
