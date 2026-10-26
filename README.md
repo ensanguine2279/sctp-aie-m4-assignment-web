@@ -247,7 +247,7 @@ graph TD
     end
 ```
 
-Refer to the deployment workflow [here](deployment.md).
+Refer to the deployment workflow [here](deployment.md) for details.
 
 > **Deployment**: The application is deployed on Vercel, which is handled separately and is not part of this workflow. The former Railway deployment job (Stage 4) has been disabled in `ci.yml` due to a security incident.
 

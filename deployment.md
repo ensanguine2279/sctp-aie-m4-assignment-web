@@ -2,9 +2,7 @@
 
 This GitHub Actions workflow ([CI/CD Pipeline & Semantic Release](https://github.com/ensanguine2279/sctp-aie-m4-assignment-web/actions/workflows/ci.yml)) runs automatically whenever code is pushed to the `main` branch. It executes a sequential 3-job pipeline to validate code, release version tags, and publish a Docker image.
 
-![Running GitHub Actions workflow](images/web-gha-pipeline.jpg)
-
-GitHub Repository: [sctp-aie-m4-assignment-web](https://github.com/ensanguine2279/sctp-aie-m4-assignment-web)
+![Running GitHub Actions workflow](assets/images/web-gha-pipeline.jpg)
 
 ---
 
@@ -46,7 +44,7 @@ After versioning completes and if a new version is released, the application is 
 
 3. **Build & Push**: Compiles the Docker image and pushes all tagged variations to Docker Hub in a single operation.
 
-![taskflow-nextjs repository on Docker Hub](images/web-docker-repo.jpg)
+![taskflow-nextjs repository on Docker Hub](assets/images/web-docker-repo.jpg)
 
 ---
 
@@ -54,4 +52,4 @@ After versioning completes and if a new version is released, the application is 
 
 The final Railway deployment job is currently commented out in the workflow configuration. Docker image building and registry publishing occur on push, while production application hosting/deployment is handled separately (such as on Vercel).
 
-![taskflow-nextjs deployed on Vercel](images/vercel-deployment.jpg)
+![taskflow-nextjs deployed on Vercel](assets/images/vercel-deployment.jpg)
