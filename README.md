@@ -226,7 +226,7 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 
 ## 7. CI/CD Pipeline Architecture
 
-The application uses a 4-stage GitHub Actions workflow (`.github/workflows/ci.yml`) that automates code verification, semantic versioning, container image publishing, and Railway cloud deployment.
+The application uses a 3-stage GitHub Actions workflow (`.github/workflows/ci.yml`) that automates code verification, semantic versioning, and container image publishing. The Publish stage runs only when the Semantic Release stage publishes a new version; if no releasable commits are found, the pipeline ends after Stage 2.
 
 ```mermaid
 graph TD
@@ -235,22 +235,19 @@ graph TD
     end
 
     subgraph Stage2 ["Stage 2: Semantic Release"]
-        B -->|"Success"| C["2) Calculate Version & Create Release"]
-        C --> D["Generate Git Tag & GitHub Release Notes"]
+        B -->|"Success"| C["2) Analyze Commits & Calculate Next Version"]
+        C --> Q{"New version released?"}
+        Q -->|"Yes"| D["Generate Git Tag & GitHub Release Notes"]
+        Q -->|"No"| X["Skip Publish"]
     end
 
     subgraph Stage3 ["Stage 3: Publish"]
         D -->|"Success"| E["3) Build Docker Image"]
         E --> F["Push to Docker Hub<br/>:latest, :sha, :version, :tag"]
     end
-
-    subgraph Stage4 ["Stage 4: Deploy"]
-        F -->|"Success"| G["4) Railway CLI Redeploy"]
-        G --> H["Railway pulls latest image & restarts service"]
-    end
 ```
 
-> The deployment to Railway has been replaced by Vercel due to security concerns/incident.
+> **Deployment**: The application is deployed on Vercel, which is handled separately and is not part of this workflow. The former Railway deployment job (Stage 4) has been disabled in `ci.yml` due to a security incident.
 
 ## 8. Tech Stack
 

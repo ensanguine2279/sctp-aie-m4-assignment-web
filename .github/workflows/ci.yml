@@ -102,9 +102,11 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   # JOB 3: Build Docker Image and Publish to Docker Hub
+  # Runs only when semantic-release published a new version; otherwise it is skipped.
   publish:
     name: Publish Docker Image
     needs: release
+    if: needs.release.outputs.new_release_published == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -125,11 +127,7 @@ jobs:
         run: |
           DOCKER_REPO="${{ secrets.DOCKER_USERNAME }}/taskflow-nextjs"
           TAGS="${DOCKER_REPO}:latest,${DOCKER_REPO}:${{ github.sha }}"
-
-          # If semantic release produced a new version/tag, include it in the push
-          if [ "${{ needs.release.outputs.new_release_published }}" = "true" ]; then
-            TAGS="${TAGS},${DOCKER_REPO}:${{ needs.release.outputs.new_release_version }},${DOCKER_REPO}:${{ needs.release.outputs.new_release_git_tag }}"
-          fi
+          TAGS="${TAGS},${DOCKER_REPO}:${{ needs.release.outputs.new_release_version }},${DOCKER_REPO}:${{ needs.release.outputs.new_release_git_tag }}"
 
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
 
