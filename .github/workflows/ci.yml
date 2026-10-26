@@ -1,4 +1,4 @@
-name: Test & Semantic Release
+name: CI/CD Pipeline & Semantic Release
 
 on:
   push:
@@ -100,3 +100,59 @@ jobs:
             echo "| Tag | ${{ steps.semantic.outputs.new_release_git_tag }} |"
             echo "| Commit | \`${{ github.sha }}\` |"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # JOB 3: Build Docker Image and Publish to Docker Hub
+  publish:
+    name: Publish Docker Image
+    needs: release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Determine Docker Image Tags
+        id: docker_tags
+        run: |
+          DOCKER_REPO="${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api"
+          TAGS="${DOCKER_REPO}:latest,${DOCKER_REPO}:${{ github.sha }}"
+
+          # If semantic release produced a new version/tag, include it in the push
+          if [ "${{ needs.release.outputs.new_release_published }}" = "true" ]; then
+            TAGS="${TAGS},${DOCKER_REPO}:${{ needs.release.outputs.new_release_version }},${DOCKER_REPO}:${{ needs.release.outputs.new_release_git_tag }}"
+          fi
+
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.docker_tags.outputs.tags }}
+
+  # Commented out Railway deployment job due to security concerns
+  # Deployment to Vercel is handled separately and not included in this workflow
+  #
+  # JOB 4: Trigger Railway Redeployment
+  #deploy:
+  #  name: Deploy to Railway
+  #  needs: publish
+  #  runs-on: ubuntu-latest
+  #
+  #  steps:
+  #    - name: Install Railway CLI & Trigger Redeploy
+  #      env:
+  #        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  #      run: |
+  #        npm install -g @railway/cli
+  #        railway redeploy --service ${{ secrets.RAILWAY_SERVICE_NAME }} --yes

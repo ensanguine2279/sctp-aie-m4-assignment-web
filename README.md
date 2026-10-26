@@ -1,10 +1,51 @@
 # Task Management Portal
 
-A modern, full-stack Next.js web application for organizational task management and user administration. Built on Next.js App Router, Server Actions, and Tailwind CSS, this portal integrates seamlessly with distributed Spring Boot microservices (`TASK_SERVICE_URL` and `USER_SERVICE_URL`) using RS256-signed JWTs for Role-Based Access Control (RBAC).
+The Task Management Portal is built using a Backend-for-Frontend (BFF) architecture with Next.js App Router, Tailwind CSS, and TypeScript. It communicates with two distributed Spring Boot microservices (`TASK_SERVICE_URL` and `USER_SERVICE_URL`) using asymmetric RS256-signed JSON Web Tokens (JWT) for authentication and Role-Based Access Control (RBAC).
 
 ---
 
-## Key Features
+## 2. High-Level System Architecture
+
+```mermaid
+graph TD
+    subgraph Client Tier
+        Client[Browser / Client UI]
+    end
+
+    subgraph Next.js Application Tier (BFF)
+        Middleware[Next.js Middleware / Session Validator]
+        RSC_Tasks[app/dashboard/tasks/page.tsx<br/>Server Component]
+        RSC_Users[app/dashboard/users/page.tsx<br/>Server Component]
+        SA_Tasks[lib/actions/tasks.ts<br/>Server Actions]
+        SA_Users[lib/actions/users.ts<br/>Server Actions]
+        AuthUtil[lib/auth.ts<br/>RS256 Claims Parser]
+    end
+
+    subgraph Spring Boot Microservices
+        TaskService[(Task Microservice<br/>:8081)]
+        UserService[(User Microservice<br/>:8082)]
+    end
+
+    Client -->|1. HTTP Page Requests| Middleware
+    Middleware -->|2. Validates RS256 Token| AuthUtil
+    Middleware -->|3. Route Request| RSC_Tasks
+    Middleware -->|3. Route Request| RSC_Users
+
+    Client -->|4. Interactive Form Submissions| SA_Tasks
+    Client -->|4. Interactive Form Submissions| SA_Users
+
+    RSC_Tasks -->|Fetch Tasks| TaskService
+    RSC_Tasks -->|Fetch Users| UserService
+    RSC_Users -->|Fetch User Directory| UserService
+
+    SA_Tasks -->|POST / PUT / DELETE / PATCH| TaskService
+    SA_Users -->|POST / PUT / DELETE| UserService
+
+```
+
+---
+
+## 3. Key Features
 
 ### 📋 Task Registry (`/dashboard/tasks`)
 
@@ -25,11 +66,141 @@ A modern, full-stack Next.js web application for organizational task management 
 
 ---
 
-## Role-Based Access Control (RBAC)
+## 4. Authentication & Authorization Sequence (RS256 JWT)
+
+Authentication relies on RS256 asymmetric signatures (Public/Private key pair). The Next.js server verifies token signatures and extracts session claims (`userId`, `username`, `role`) before executing Server Actions or rendering components.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Client (Browser)
+    participant Next as Next.js Server (BFF)
+    participant Auth as Auth Handler (lib/auth.ts)
+    participant TaskAPI as Task Microservice (:8081)
+
+    User->>Next: Navigate to /dashboard/tasks (Cookie: session_token)
+    Next->>Auth: Decode & Verify RS256 JWT Token
+    Auth-->>Next: Extracted Session (userId: 42, role: 'USER')
+
+    alt Valid Authorization Token
+        Next->>TaskAPI: GET /api/tasks (Header: Authorization: Bearer <token>)
+        TaskAPI-->>Next: Returns 200 OK + Task Dataset JSON
+        Next-->>User: Render Task Table (Actions Column & Create Button hidden for USER role)
+    else Invalid or Expired Token
+        Auth-->>Next: Verification Failure / Token Expired
+        Next-->>User: Redirect to /login
+    end
+
+```
+
+---
+
+## 4. Microservice REST API Integration
+
+### 4.1 Task Microservice (`TASK_SERVICE_URL`)
+
+```mermaid
+flowchart LR
+    subgraph Next.js Frontend Layer
+        TaskTable[TaskTable Client Component]
+        ToggleAction[toggleTaskCompletion()]
+        CreateAction[createTask()]
+        EditAction[updateTask()]
+        DeleteAction[deleteTask()]
+    end
+
+    subgraph Task Microservice REST Endpoints
+        GET_Tasks[GET /api/tasks]
+        POST_Tasks[POST /api/tasks]
+        PUT_Task[PUT /api/tasks/{id}]
+        PATCH_Status[PATCH /api/tasks/{id}/status]
+        DELETE_Task[DELETE /api/tasks/{id}]
+    end
+
+    TaskTable -->|Initial Load (Server Component)| GET_Tasks
+    CreateAction -->|ADMIN / MANAGER| POST_Tasks
+    EditAction -->|ADMIN / MANAGER| PUT_Task
+    ToggleAction -->|ADMIN / MANAGER / Task Assignee| PATCH_Status
+    DeleteAction -->|ADMIN / MANAGER| DELETE_Task
+
+```
+
+#### Endpoint Definitions
+
+| Endpoint                 | Method   | Required Role                  | Payload / Constraints                      | Description                                  |
+| ------------------------ | -------- | ------------------------------ | ------------------------------------------ | -------------------------------------------- |
+| `/api/tasks`             | `GET`    | `ADMIN`, `MANAGER`, `USER`     | None                                       | Retrieves task list accessible to user role. |
+| `/api/tasks`             | `POST`   | `ADMIN`, `MANAGER`             | `{ title, description, priority, userId }` | Creates task assigned to a `USER` account.   |
+| `/api/tasks/{id}`        | `PUT`    | `ADMIN`, `MANAGER`             | `{ title, description, priority, userId }` | Updates task metadata or reassignment.       |
+| `/api/tasks/{id}/status` | `PATCH`  | `ADMIN`, `MANAGER`, Task Owner | `{ completed: boolean }`                   | Toggles completion status.                   |
+| `/api/tasks/{id}`        | `DELETE` | `ADMIN`, `MANAGER`             | None                                       | Removes a task record.                       |
+
+---
+
+### 4.2 User Microservice (`USER_SERVICE_URL`)
+
+```mermaid
+flowchart LR
+    subgraph Next.js Frontend Layer
+        PageLoad[Tasks & Users Server Components]
+        UserActions[lib/actions/users.ts]
+    end
+
+    subgraph User Microservice REST Endpoints
+        GET_Users[GET /api/users]
+        POST_Users[POST /api/users]
+        PUT_Users[PUT /api/users/{id}]
+        DELETE_Users[DELETE /api/users/{id}]
+    end
+
+    PageLoad -->|Fetch Assignees / User Directory| GET_Users
+    UserActions -->|Create Account (ADMIN Only)| POST_Users
+    UserActions -->|Update Account (ADMIN Only)| PUT_Users
+    UserActions -->|Delete Account (ADMIN Only)| DELETE_Users
+
+```
+
+#### Endpoint Definitions
+
+| Endpoint          | Method   | Required Role      | Payload / Constraints                                                                                     | Description                                     |
+| ----------------- | -------- | ------------------ | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `/api/users`      | `GET`    | `ADMIN`, `MANAGER` | None                                                                                                      | Fetches directory of system user accounts.      |
+| `/api/users`      | `POST`   | `ADMIN`            | `name` (2-50 chars), `username` (`[a-z0-9]+`), `password` (8-72 chars), `role` (`ADMIN`/`MANAGER`/`USER`) | Registers a new user account.                   |
+| `/api/users/{id}` | `PUT`    | `ADMIN`            | Same constraints as `POST` endpoint                                                                       | Modifies existing user account details or role. |
+| `/api/users/{id}` | `DELETE` | `ADMIN`            | Path variable `{id}`                                                                                      | Removes a system user account.                  |
+
+---
+
+## 5. Client Data Processing Pipeline
+
+Tasks and user dropdowns undergo in-memory filtering and sorting prior to rendering:
+
+```mermaid
+graph TB
+    subgraph Data Ingestion
+        RSC[Server Component Fetch] -->|initialTasks & users| TaskTable[TaskTable Component State]
+    end
+
+    subgraph Data Processing Pipeline
+        TaskTable --> Filter_Search[1. Search Filter: Title & Description]
+        Filter_Search --> Filter_Priority[2. Priority Filter: LOW / MEDIUM / HIGH]
+        Filter_Priority --> Filter_Assignee[3. Assignee Filter: User ID]
+        Filter_Assignee --> Sort_Title[4. Title Sort: localeCompare Alphabetical]
+    end
+
+    subgraph UI Render
+        Sort_Title --> DOM[Rendered Data Table]
+    end
+
+```
+
+---
+
+## 6. Role-Based Access Control (RBAC)
 
 The application enforces strict RBAC across UI components, Server Actions, and backend API endpoints for both Task Management and User Management.
 
-### 1. Task Management RBAC
+### Task Management RBAC
 
 | Action / Feature               |  `ADMIN`  | `MANAGER` |     `USER`     |
 | :----------------------------- | :-------: | :-------: | :------------: |
@@ -42,7 +213,7 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 | **Delete Task**                |    Yes    |    Yes    |       No       |
 | **Actions Column Visibility**  |  Visible  |  Visible  |   **Hidden**   |
 
-### 2. User Management RBAC (`/dashboard/users`)
+### User Management RBAC (`/dashboard/users`)
 
 | Action / Feature                               | `ADMIN` |   `MANAGER`   |    `USER`     |
 | :--------------------------------------------- | :-----: | :-----------: | :-----------: |
@@ -55,7 +226,35 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 
 ---
 
-## Tech Stack
+## 7. CI/CD Pipeline Architecture
+
+The application is deployed using a 4-stage GitHub Actions workflow targeting Docker Hub and Railway:
+
+```mermaid
+graph LR
+    subgraph Stage 1: Test & Build
+        A[Git Push to main] --> B[1. Lint, Test & Build Check]
+    end
+
+    subgraph Stage 2: Semantic Release
+        B -->|Success| C[2. Calculate Version & Create Release]
+        C --> D[Generate Git Tag & GitHub Release Notes]
+    end
+
+    subgraph Stage 3: Publish
+        D -->|Success| E[3. Build Docker Image]
+        E --> F[Push to Docker Hub<br/>:latest, :sha, :version, :tag]
+    end
+
+    subgraph Stage 4: Deploy
+        F -->|Success| G[4. Railway CLI Redeploy]
+        G --> H[Railway pulls latest image & restarts service]
+    end
+```
+
+> The deployment to Railway has been replaced by Vercel due to security concerns/incident.
+
+## 8. Tech Stack
 
 - **Frontend Framework**: [Next.js 15+](https://nextjs.org/) (App Router, React Server Components, Server Actions)
 - **Styling & UI**: [Tailwind CSS](https://tailwindcss.com/), [Lucide React Icons](https://lucide.dev/)
@@ -153,7 +352,3 @@ To ensure data integrity between the Next.js frontend and the Java Spring Boot b
 - **Username**: 6 – 20 lowercase alphanumeric characters (`pattern="[a-z0-9]+"` required)
 - **Password**: 8 – 72 characters
 - **Role**: Required (`ADMIN`, `MANAGER`, `USER`)
-
-```
-
-```
