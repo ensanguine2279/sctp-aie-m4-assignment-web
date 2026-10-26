@@ -49,6 +49,8 @@ jobs:
       new_release_published: ${{ steps.semantic.outputs.new_release_published }}
       new_release_version: ${{ steps.semantic.outputs.new_release_version }}
       new_release_git_tag: ${{ steps.semantic.outputs.new_release_git_tag }}
+      commit_sha: ${{ github.sha }}
+      commit_sha_short: ${{ steps.sha.outputs.short }}
 
     steps:
       - name: Checkout repository
@@ -69,6 +71,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Record commit SHA
+        id: sha
+        run: echo "short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Print Semantic Release Outcome & Outputs
         if: always()
         run: |
@@ -79,4 +85,18 @@ jobs:
           echo "New Release Published?:   ${{ steps.semantic.outputs.new_release_published }}"
           echo "New Release Version:      ${{ steps.semantic.outputs.new_release_version }}"
           echo "New Git Tag:              ${{ steps.semantic.outputs.new_release_git_tag }}"
+          echo "Commit SHA:               ${{ github.sha }}"
           echo "=================================================="
+
+      - name: Add release details to the run summary
+        if: always()
+        run: |
+          {
+            echo "### Release"
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Published | ${{ steps.semantic.outputs.new_release_published }} |"
+            echo "| Version | ${{ steps.semantic.outputs.new_release_version }} |"
+            echo "| Tag | ${{ steps.semantic.outputs.new_release_git_tag }} |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
