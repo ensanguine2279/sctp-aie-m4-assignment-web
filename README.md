@@ -40,6 +40,7 @@ graph TD
 
     SA_Tasks -->|"POST / PUT / DELETE / PATCH"| TaskService
     SA_Users -->|"POST / PUT / DELETE"| UserService
+
 ```
 
 ---
@@ -229,7 +230,7 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 
 The application uses a 4-stage GitHub Actions workflow (`.github/workflows/ci.yml`) that automates code verification, semantic versioning, container image publishing, and Railway cloud deployment.
 
-```mermaid
+````mermaid
 graph LR
     subgraph Stage 1: Test & Build
         A[Git Push to main] --> B[1. Lint, Test & Build Check]
@@ -249,7 +250,6 @@ graph LR
         F -->|Success| G[4. Railway CLI Redeploy]
         G --> H[Railway pulls latest image & restarts service]
     end
-```
 
 > The deployment to Railway has been replaced by Vercel due to security concerns/incident.
 
