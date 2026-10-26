@@ -38,7 +38,7 @@ export default async function DashboardLayout({
               href="/dashboard"
               className="font-bold text-sm tracking-tight text-gray-900"
             >
-              TaskMaster{" "}
+              TaskFlow{" "}
               <span className="text-[#209dd7] font-normal">Enterprise</span>
             </Link>
             <nav className="flex items-center space-x-4 text-xs font-medium text-gray-600 border-l border-gray-200 pl-6">
