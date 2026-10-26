@@ -123,7 +123,7 @@ jobs:
       - name: Determine Docker Image Tags
         id: docker_tags
         run: |
-          DOCKER_REPO="${{ secrets.DOCKER_USERNAME }}/taskflow-api"
+          DOCKER_REPO="${{ secrets.DOCKER_USERNAME }}/taskflow-nextjs"
           TAGS="${DOCKER_REPO}:latest,${DOCKER_REPO}:${{ github.sha }}"
 
           # If semantic release produced a new version/tag, include it in the push
