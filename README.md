@@ -4,7 +4,7 @@ The Task Management Portal is built using a Backend-for-Frontend (BFF) architect
 
 ---
 
-## 2. High-Level System Architecture
+## 1. High-Level System Architecture
 
 ```mermaid
 graph TD
@@ -45,7 +45,7 @@ graph TD
 
 ---
 
-## 3. Key Features
+## 2. Key Features
 
 ### 📋 Task Registry (`/dashboard/tasks`)
 
@@ -66,7 +66,7 @@ graph TD
 
 ---
 
-## 4. Authentication & Authorization Sequence (RS256 JWT)
+## 3. Authentication & Authorization Sequence (RS256 JWT)
 
 Authentication relies on RS256 asymmetric signatures (Public/Private key pair). The Next.js server verifies token signatures and extracts session claims (`userId`, `username`, `role`) before executing Server Actions or rendering components.
 
@@ -83,7 +83,7 @@ sequenceDiagram
     Auth-->>Next: Extracted Session (userId: 42, role: 'USER')
 
     alt Valid Authorization Token
-        Next->>TaskAPI: GET /api/tasks (Header: Authorization: Bearer <token>)
+        Next->>TaskAPI: GET /api/tasks (Header: Authorization: Bearer #lt;token#gt;)
         TaskAPI-->>Next: Returns 200 OK + Task Dataset JSON
         Next-->>User: Render Task Table (Actions Column & Create Button hidden for USER role)
     else Invalid or Expired Token
@@ -101,28 +101,27 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    subgraph Next.js Frontend Layer
-        TaskTable[TaskTable Client Component]
-        ToggleAction[toggleTaskCompletion()]
-        CreateAction[createTask()]
-        EditAction[updateTask()]
-        DeleteAction[deleteTask()]
+    subgraph Frontend_Layer ["Next.js Frontend Layer"]
+        TaskTable["TaskTable Client Component"]
+        ToggleAction["toggleTaskCompletion()"]
+        CreateAction["createTask()"]
+        EditAction["updateTask()"]
+        DeleteAction["deleteTask()"]
     end
 
-    subgraph Task Microservice REST Endpoints
-        GET_Tasks[GET /api/tasks]
-        POST_Tasks[POST /api/tasks]
-        PUT_Task[PUT /api/tasks/{id}]
-        PATCH_Status[PATCH /api/tasks/{id}/status]
-        DELETE_Task[DELETE /api/tasks/{id}]
+    subgraph Task_Endpoints ["Task Microservice REST Endpoints"]
+        GET_Tasks["GET /api/tasks"]
+        POST_Tasks["POST /api/tasks"]
+        PUT_Task["PUT /api/tasks/{id}"]
+        PATCH_Status["PATCH /api/tasks/{id}/status"]
+        DELETE_Task["DELETE /api/tasks/{id}"]
     end
 
-    TaskTable -->|Initial Load (Server Component)| GET_Tasks
-    CreateAction -->|ADMIN / MANAGER| POST_Tasks
-    EditAction -->|ADMIN / MANAGER| PUT_Task
-    ToggleAction -->|ADMIN / MANAGER / Task Assignee| PATCH_Status
-    DeleteAction -->|ADMIN / MANAGER| DELETE_Task
-
+    TaskTable -->|"Initial Load (Server Component)"| GET_Tasks
+    CreateAction -->|"ADMIN / MANAGER"| POST_Tasks
+    EditAction -->|"ADMIN / MANAGER"| PUT_Task
+    ToggleAction -->|"ADMIN / MANAGER / Task Assignee"| PATCH_Status
+    DeleteAction -->|"ADMIN / MANAGER"| DELETE_Task
 ```
 
 #### Endpoint Definitions
@@ -141,23 +140,22 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    subgraph Next.js Frontend Layer
-        PageLoad[Tasks & Users Server Components]
-        UserActions[lib/actions/users.ts]
+    subgraph Frontend_Layer ["Next.js Frontend Layer"]
+        PageLoad["Tasks & Users Server Components"]
+        UserActions["lib/actions/users.ts"]
     end
 
-    subgraph User Microservice REST Endpoints
-        GET_Users[GET /api/users]
-        POST_Users[POST /api/users]
-        PUT_Users[PUT /api/users/{id}]
-        DELETE_Users[DELETE /api/users/{id}]
+    subgraph User_Endpoints ["User Microservice REST Endpoints"]
+        GET_Users["GET /api/users"]
+        POST_Users["POST /api/users"]
+        PUT_Users["PUT /api/users/{id}"]
+        DELETE_Users["DELETE /api/users/{id}"]
     end
 
-    PageLoad -->|Fetch Assignees / User Directory| GET_Users
-    UserActions -->|Create Account (ADMIN Only)| POST_Users
-    UserActions -->|Update Account (ADMIN Only)| PUT_Users
-    UserActions -->|Delete Account (ADMIN Only)| DELETE_Users
-
+    PageLoad -->|"Fetch Assignees / User Directory"| GET_Users
+    UserActions -->|"Create Account (ADMIN Only)"| POST_Users
+    UserActions -->|"Update Account (ADMIN Only)"| PUT_Users
+    UserActions -->|"Delete Account (ADMIN Only)"| DELETE_Users
 ```
 
 #### Endpoint Definitions
@@ -177,19 +175,19 @@ Tasks and user dropdowns undergo in-memory filtering and sorting prior to render
 
 ```mermaid
 graph TB
-    subgraph Data Ingestion
-        RSC[Server Component Fetch] -->|initialTasks & users| TaskTable[TaskTable Component State]
+    subgraph Ingestion ["Data Ingestion"]
+        RSC["Server Component Fetch"] -->|"initialTasks & users"| TaskTable["TaskTable Component State"]
     end
 
-    subgraph Data Processing Pipeline
-        TaskTable --> Filter_Search[1. Search Filter: Title & Description]
-        Filter_Search --> Filter_Priority[2. Priority Filter: LOW / MEDIUM / HIGH]
-        Filter_Priority --> Filter_Assignee[3. Assignee Filter: User ID]
-        Filter_Assignee --> Sort_Title[4. Title Sort: localeCompare Alphabetical]
+    subgraph Pipeline ["Data Processing Pipeline"]
+        TaskTable --> Filter_Search["1#46; Search Filter: Title & Description"]
+        Filter_Search --> Filter_Priority["2#46; Priority Filter: LOW / MEDIUM / HIGH"]
+        Filter_Priority --> Filter_Assignee["3#46; Assignee Filter: User ID"]
+        Filter_Assignee --> Sort_Title["4#46; Title Sort: localeCompare Alphabetical"]
     end
 
-    subgraph UI Render
-        Sort_Title --> DOM[Rendered Data Table]
+    subgraph Render ["UI Render"]
+        Sort_Title --> DOM["Rendered Data Table"]
     end
 
 ```
@@ -230,26 +228,27 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 
 The application uses a 4-stage GitHub Actions workflow (`.github/workflows/ci.yml`) that automates code verification, semantic versioning, container image publishing, and Railway cloud deployment.
 
-````mermaid
+```mermaid
 graph LR
-    subgraph Stage 1: Test & Build
-        A[Git Push to main] --> B[1. Lint, Test & Build Check]
+    subgraph Stage1 ["Stage 1: Test & Build"]
+        A["Git Push to main"] --> B["1#46; Lint, Test & Build Check"]
     end
 
-    subgraph Stage 2: Semantic Release
-        B -->|Success| C[2. Calculate Version & Create Release]
-        C --> D[Generate Git Tag & GitHub Release Notes]
+    subgraph Stage2 ["Stage 2: Semantic Release"]
+        B -->|"Success"| C["2#46; Calculate Version & Create Release"]
+        C --> D["Generate Git Tag & GitHub Release Notes"]
     end
 
-    subgraph Stage 3: Publish
-        D -->|Success| E[3. Build Docker Image]
-        E --> F[Push to Docker Hub<br/>:latest, :sha, :version, :tag]
+    subgraph Stage3 ["Stage 3: Publish"]
+        D -->|"Success"| E["3#46; Build Docker Image"]
+        E --> F["Push to Docker Hub<br/>:latest, :sha, :version, :tag"]
     end
 
-    subgraph Stage 4: Deploy
-        F -->|Success| G[4. Railway CLI Redeploy]
-        G --> H[Railway pulls latest image & restarts service]
+    subgraph Stage4 ["Stage 4: Deploy"]
+        F -->|"Success"| G["4#46; Railway CLI Redeploy"]
+        G --> H["Railway pulls latest image & restarts service"]
     end
+```
 
 > The deployment to Railway has been replaced by Vercel due to security concerns/incident.
 
@@ -263,7 +262,7 @@ graph LR
 
 ---
 
-## Project Architecture & Directory Structure
+## 9. Project Architecture & Directory Structure
 
 ```text
 ├── app/
@@ -283,11 +282,11 @@ graph LR
 │   └── auth.ts                   # RS256 JWT token verification & claim extraction
 ├── .env.local                    # Local environment variables (git-ignored)
 └── package.json
-````
+```
 
 ---
 
-## Getting Started
+## 10. Getting Started
 
 ### Prerequisites
 
@@ -334,7 +333,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 
 ---
 
-## Form Validation Standards
+## 11. Form Validation Standards
 
 To ensure data integrity between the Next.js frontend and the Java Spring Boot backend DTOs, the following validation constraints are enforced:
 
