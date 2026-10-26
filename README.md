@@ -6,7 +6,7 @@ The Task Management Portal is built using a Backend-for-Frontend (BFF) architect
 
 ## 2. High-Level System Architecture
 
-````mermaid
+```mermaid
 graph TD
     subgraph Client_Tier ["Client Tier"]
         Client["Browser / Client UI"]
@@ -40,6 +40,7 @@ graph TD
 
     SA_Tasks -->|"POST / PUT / DELETE / PATCH"| TaskService
     SA_Users -->|"POST / PUT / DELETE"| UserService
+```
 
 ---
 
@@ -89,7 +90,7 @@ sequenceDiagram
         Next-->>User: Redirect to /login
     end
 
-````
+```
 
 ---
 
@@ -226,7 +227,7 @@ The application enforces strict RBAC across UI components, Server Actions, and b
 
 ## 7. CI/CD Pipeline Architecture
 
-The application is deployed using a 4-stage GitHub Actions workflow targeting Docker Hub and Railway:
+The application uses a 4-stage GitHub Actions workflow (`.github/workflows/ci.yml`) that automates code verification, semantic versioning, container image publishing, and Railway cloud deployment.
 
 ```mermaid
 graph LR
@@ -282,7 +283,7 @@ graph LR
 │   └── auth.ts                   # RS256 JWT token verification & claim extraction
 ├── .env.local                    # Local environment variables (git-ignored)
 └── package.json
-```
+````
 
 ---
 
