@@ -101,7 +101,10 @@ export async function createTaskAction(
     revalidatePath("/dashboard/tasks");
     return { success: true };
   } catch (error) {
-    return { error: "Network error creating task." };
+    return {
+      error:
+        error instanceof Error ? error.message : "Network error creating task.",
+    };
   }
 }
 
@@ -141,7 +144,10 @@ export async function updateTaskAction(
     revalidatePath("/dashboard/tasks");
     return { success: true };
   } catch (error) {
-    return { error: "Network error updating task." };
+    return {
+      error:
+        error instanceof Error ? error.message : "Network error updating task.",
+    };
   }
 }
 
@@ -158,7 +164,10 @@ export async function deleteTaskAction(id: number): Promise<TaskFormState> {
     revalidatePath("/tasks");
     return { success: true };
   } catch (error) {
-    return { error: "Network error deleting task." };
+    return {
+      error:
+        error instanceof Error ? error.message : "Network error deleting task.",
+    };
   }
 }
 

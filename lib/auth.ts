@@ -31,6 +31,7 @@ export async function getSessionClaims(): Promise<SessionClaims | null> {
       exp: claims.exp,
     };
   } catch (error) {
+    console.error("Failed to decode JWT:", error);
     return null;
   }
 }

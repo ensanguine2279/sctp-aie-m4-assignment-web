@@ -42,7 +42,12 @@ export async function loginAction(
       maxAge: 60 * 60 * 1, // 1 hour
     });
   } catch (err) {
-    return { error: "Unable to connect to authentication service." };
+    return {
+      error:
+        err instanceof Error
+          ? err.message
+          : "Unable to connect to authentication service.",
+    };
   }
 
   // Next.js redirect must be called outside try/catch blocks

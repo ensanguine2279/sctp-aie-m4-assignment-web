@@ -110,7 +110,12 @@ export async function createUserAction(
     revalidatePath("/dashboard/users");
     return { success: true };
   } catch (error) {
-    return { error: "Network error while connecting to User Service." };
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Network error while connecting to User Service.",
+    };
   }
 }
 
@@ -158,7 +163,12 @@ export async function updateUserAction(
     revalidatePath("/dashboard/users");
     return { success: true };
   } catch (error) {
-    return { error: "Network error while updating user." };
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Network error while updating user.",
+    };
   }
 }
 
@@ -181,6 +191,9 @@ export async function deleteUserAction(userId: number): Promise<UserFormState> {
     revalidatePath("/dashboard/users");
     return { success: true };
   } catch (error) {
-    return { error: "Network error deleting user." };
+    return {
+      error:
+        error instanceof Error ? error.message : "Network error deleting user.",
+    };
   }
 }
