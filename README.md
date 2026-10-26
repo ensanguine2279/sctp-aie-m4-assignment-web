@@ -6,42 +6,40 @@ The Task Management Portal is built using a Backend-for-Frontend (BFF) architect
 
 ## 2. High-Level System Architecture
 
-```mermaid
+````mermaid
 graph TD
-    subgraph Client Tier
-        Client[Browser / Client UI]
+    subgraph Client_Tier ["Client Tier"]
+        Client["Browser / Client UI"]
     end
 
-    subgraph Next.js Application Tier (BFF)
-        Middleware[Next.js Middleware / Session Validator]
-        RSC_Tasks[app/dashboard/tasks/page.tsx<br/>Server Component]
-        RSC_Users[app/dashboard/users/page.tsx<br/>Server Component]
-        SA_Tasks[lib/actions/tasks.ts<br/>Server Actions]
-        SA_Users[lib/actions/users.ts<br/>Server Actions]
-        AuthUtil[lib/auth.ts<br/>RS256 Claims Parser]
+    subgraph NextJS_Tier ["Next.js Application Tier (BFF)"]
+        Middleware["Next.js Middleware / Session Validator"]
+        RSC_Tasks["app/dashboard/tasks/page.tsx<br/>Server Component"]
+        RSC_Users["app/dashboard/users/page.tsx<br/>Server Component"]
+        SA_Tasks["lib/actions/tasks.ts<br/>Server Actions"]
+        SA_Users["lib/actions/users.ts<br/>Server Actions"]
+        AuthUtil["lib/auth.ts<br/>RS256 Claims Parser"]
     end
 
-    subgraph Spring Boot Microservices
-        TaskService[(Task Microservice<br/>:8081)]
-        UserService[(User Microservice<br/>:8082)]
+    subgraph Backend_Tier ["Spring Boot Microservices"]
+        TaskService[("Task Microservice<br/>:8081")]
+        UserService[("User Microservice<br/>:8082")]
     end
 
-    Client -->|1. HTTP Page Requests| Middleware
-    Middleware -->|2. Validates RS256 Token| AuthUtil
-    Middleware -->|3. Route Request| RSC_Tasks
-    Middleware -->|3. Route Request| RSC_Users
+    Client -->|"1. HTTP Page Requests"| Middleware
+    Middleware -->|"2. Validates RS256 Token"| AuthUtil
+    Middleware -->|"3. Route Request"| RSC_Tasks
+    Middleware -->|"3. Route Request"| RSC_Users
 
-    Client -->|4. Interactive Form Submissions| SA_Tasks
-    Client -->|4. Interactive Form Submissions| SA_Users
+    Client -->|"4. Interactive Form Submissions"| SA_Tasks
+    Client -->|"4. Interactive Form Submissions"| SA_Users
 
-    RSC_Tasks -->|Fetch Tasks| TaskService
-    RSC_Tasks -->|Fetch Users| UserService
-    RSC_Users -->|Fetch User Directory| UserService
+    RSC_Tasks -->|"Fetch Tasks"| TaskService
+    RSC_Tasks -->|"Fetch Users"| UserService
+    RSC_Users -->|"Fetch User Directory"| UserService
 
-    SA_Tasks -->|POST / PUT / DELETE / PATCH| TaskService
-    SA_Users -->|POST / PUT / DELETE| UserService
-
-```
+    SA_Tasks -->|"POST / PUT / DELETE / PATCH"| TaskService
+    SA_Users -->|"POST / PUT / DELETE"| UserService
 
 ---
 
@@ -91,7 +89,7 @@ sequenceDiagram
         Next-->>User: Redirect to /login
     end
 
-```
+````
 
 ---
 
