@@ -3,6 +3,7 @@ import { getUsers } from "@/lib/actions/users";
 import { redirect } from "next/navigation";
 import UserTable from "./user-table";
 import { Users, Eye, UserCheck } from "lucide-react";
+import ServiceStatus from "@/components/service-status";
 
 export default async function UserManagementPage() {
   const session = await getSessionClaims();
@@ -54,19 +55,8 @@ export default async function UserManagementPage() {
                 </span>
               )}
 
-              {/* Connection Indicator */}
-              <div className="inline-flex items-center px-3 py-2 text-xs font-medium border border-emerald-200 bg-emerald-50 text-emerald-700">
-                <span className="relative flex h-2.5 w-2.5 mr-2.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
-                <div className="flex flex-col">
-                  <span>User Microservice</span>
-                  <span className="font-mono text-[10px] opacity-80 leading-tight mt-0.5">
-                    (USER_SERVICE_URL)
-                  </span>
-                </div>
-              </div>
+              {/* Live connection indicator, polls /api/health */}
+              <ServiceStatus service="users" label="User Microservice" />
             </div>
           </div>
         </div>
