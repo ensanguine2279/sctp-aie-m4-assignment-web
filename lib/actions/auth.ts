@@ -2,6 +2,8 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { decodeJwt } from "jose";
+import { homePathFor } from "@/lib/auth";
 
 export interface AuthState {
   error?: string;
@@ -17,6 +19,9 @@ export async function loginAction(
   if (!username || !password) {
     return { error: "Username and password are required." };
   }
+
+  // Where to send this user once the token is stored; set inside the try.
+  let destination = "/dashboard/tasks";
 
   try {
     const userServiceUrl = process.env.USER_SERVICE_URL;
@@ -41,6 +46,12 @@ export async function loginAction(
       path: "/",
       maxAge: 60 * 60 * 1, // 1 hour
     });
+
+    // Land each role on its own page. The roles are read from the token
+    // only to choose the page; the APIs still verify the token on every call.
+    const claims = decodeJwt(data.token);
+    const roles = Array.isArray(claims.roles) ? (claims.roles as string[]) : [];
+    destination = homePathFor(roles);
   } catch (err) {
     return {
       error:
@@ -51,7 +62,7 @@ export async function loginAction(
   }
 
   // Next.js redirect must be called outside try/catch blocks
-  redirect("/dashboard");
+  redirect(destination);
 }
 
 export async function logoutAction() {

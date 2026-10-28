@@ -1,9 +1,8 @@
 import { getSessionClaims } from "@/lib/auth";
 import { getUsers } from "@/lib/actions/users";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import UserTable from "./user-table";
-import { ArrowLeft, Users, Eye, UserCheck } from "lucide-react";
+import { Users, Eye, UserCheck } from "lucide-react";
 
 export default async function UserManagementPage() {
   const session = await getSessionClaims();
@@ -22,13 +21,6 @@ export default async function UserManagementPage() {
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans p-6 md:p-10">
       <div className="max-w-6xl mx-auto space-y-6">
         <div>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center text-xs text-gray-500 hover:text-gray-900 mb-4 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to Orchestration
-          </Link>
-
           <div className="bg-white border border-gray-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-purple-50 border border-purple-100 text-[#753991]">

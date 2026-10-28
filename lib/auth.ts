@@ -35,3 +35,23 @@ export async function getSessionClaims(): Promise<SessionClaims | null> {
     return null;
   }
 }
+
+/** True when the roles claim contains the administrator role. */
+export function hasAdminRole(roles: string[]): boolean {
+  return roles.includes("ROLE_ADMIN") || roles.includes("ADMIN");
+}
+
+/** True when the roles claim contains the manager role. */
+export function hasManagerRole(roles: string[]): boolean {
+  return roles.includes("ROLE_MANAGER") || roles.includes("MANAGER");
+}
+
+/**
+ * The page each role lands on after login (and when opening the site root):
+ * administrators manage users, managers watch progress, users work on tasks.
+ */
+export function homePathFor(roles: string[]): string {
+  if (hasAdminRole(roles)) return "/dashboard/users";
+  if (hasManagerRole(roles)) return "/dashboard/analytics";
+  return "/dashboard/tasks";
+}

@@ -9,7 +9,7 @@ import {
   UserCheck,
   Layers,
   Users,
-  Network,
+  BarChart3,
 } from "lucide-react";
 
 export default async function DashboardLayout({
@@ -43,12 +43,6 @@ export default async function DashboardLayout({
             </Link>
             <nav className="flex items-center space-x-4 text-xs font-medium text-gray-600 border-l border-gray-200 pl-6">
               <Link
-                href="/dashboard"
-                className="hover:text-gray-900 transition-colors flex items-center"
-              >
-                <Network className="w-3.5 h-3.5 mr-1" /> Orchestration
-              </Link>
-              <Link
                 href="/dashboard/users"
                 className="hover:text-[#753991] transition-colors flex items-center"
               >
@@ -60,6 +54,14 @@ export default async function DashboardLayout({
               >
                 <Layers className="w-3.5 h-3.5 mr-1" /> Tasks
               </Link>
+              {(isAdmin || isManager) && (
+                <Link
+                  href="/dashboard/analytics"
+                  className="hover:text-[#753991] transition-colors flex items-center"
+                >
+                  <BarChart3 className="w-3.5 h-3.5 mr-1" /> Analytics
+                </Link>
+              )}
             </nav>
           </div>
 
